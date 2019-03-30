@@ -30,6 +30,10 @@ class ASTNode(metaclass=abc.ABCMeta):
     def accept(self, visitor):
         pass
 
+    @abc.abstractmethod
+    def __eq__(self, node):
+        pass
+
 
 class ASTNodeVisitor(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -136,6 +140,10 @@ class Function(ASTNode):
     def accept(self, visitor):
         return visitor.visit_function(self)
 
+    def __eq__(self, function):
+        return isinstance(function, Function) and\
+            self.args == function.args and self.body == function.body
+
 
 class FunctionDefinition(ASTNode):
     """
@@ -157,6 +165,10 @@ class FunctionDefinition(ASTNode):
 
     def accept(self, visitor):
         return visitor.visit_function_definition(self)
+
+    def __eq__(self, func_def):
+        return isinstance(func_def, FunctionDefinition) and\
+            self.name == func_def.name and self.function == func_def.function
 
 
 class FunctionCall(ASTNode):
@@ -205,6 +217,10 @@ class FunctionCall(ASTNode):
     def accept(self, visitor):
         return visitor.visit_function_call(self)
 
+    def __eq__(self, func_call):
+        return isinstance(func_call, FunctionCall) and\
+            self.fun_expr == func_call.fun_expr and self.args == func_call.args
+
 
 class Conditional(ASTNode):
     """
@@ -243,6 +259,15 @@ class Conditional(ASTNode):
     def accept(self, visitor):
         return visitor.visit_conditional(self)
 
+    def __eq__(self, conditional):
+        return isinstance(
+            conditional,
+            Conditional) and self.condition == conditional.condition and (
+            self.if_true or []) == (
+            conditional.if_true or []) and (
+                self.if_false or []) == (
+                    conditional.if_false or [])
+
 
 class Print(ASTNode):
     """
@@ -270,6 +295,9 @@ class Print(ASTNode):
     def accept(self, visitor):
         return visitor.visit_print(self)
 
+    def __eq__(self, print):
+        return isinstance(print, Print) and self.expr == print.expr
+
 
 class Read(ASTNode):
     """
@@ -296,6 +324,9 @@ class Read(ASTNode):
     def accept(self, visitor):
         return visitor.visit_read(self)
 
+    def __eq__(self, read):
+        return isinstance(read, Read) and self.name == read.name
+
 
 class Reference(ASTNode):
     """
@@ -312,6 +343,9 @@ class Reference(ASTNode):
 
     def accept(self, visitor):
         return visitor.visit_reference(self)
+
+    def __eq__(self, reference):
+        return isinstance(reference, Reference) and self.name == reference.name
 
 
 class BinaryOperation(ASTNode):
@@ -373,6 +407,11 @@ class BinaryOperation(ASTNode):
     def accept(self, visitor):
         return visitor.visit_binary_operation(self)
 
+    def __eq__(self, bin_op):
+        return isinstance(bin_op, BinaryOperation) and\
+            self.op == bin_op.op and self.lhs == bin_op.lhs and\
+            self.rhs == bin_op.rhs
+
 
 class UnaryOperation(ASTNode):
     """
@@ -402,3 +441,7 @@ class UnaryOperation(ASTNode):
 
     def accept(self, visitor):
         return visitor.visit_unary_operation(self)
+
+    def __eq__(self, un_op):
+        return isinstance(un_op, UnaryOperation) and\
+            self.op == un_op.op and self.expr == un_op.expr
