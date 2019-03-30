@@ -45,13 +45,13 @@ def test_pretty_binary_operation(capsys):
     mul = BinaryOperation(Number(0), '*', add)
     pretty_print(mul)
     out = capsys.readouterr().out
-    assert out.rstrip() == '(0 * (2 + 3));'
+    assert out.rstrip() == '(0) * ((2) + (3));'
 
 
 def test_pretty_unary_operation(capsys):
     pretty_print(UnaryOperation('-', Number(42)))
     out = capsys.readouterr().out
-    assert out.rstrip() == '(-42);'
+    assert out.rstrip() == '-(42);'
 
 
 def test_pretty_function_call(capsys):
@@ -82,11 +82,11 @@ def test_complex(capsys):
         'def main(arg1) {',
         '    read x;',
         '    print x;',
-        '    if ((2 == 3)) {',
+        '    if ((2) == (3)) {',
         '        if (1) {',
         '        };',
         '    } else {',
-        '        exit((-arg1));',
+        '        exit(-(arg1));',
         '    };',
         '};']
 

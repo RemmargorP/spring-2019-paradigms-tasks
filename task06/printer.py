@@ -89,13 +89,13 @@ class PrettyPrinter(ASTNodeVisitor):
         rhs_result = binary_operation.rhs.accept(self)
         self.indent_disable_count -= 1
         return self.indent() + \
-            f'({lhs_result} {binary_operation.op} {rhs_result})'
+            f'({lhs_result}) {binary_operation.op} ({rhs_result})'
 
     def visit_unary_operation(self, unary_operation):
         self.indent_disable_count += 1
         expr_result = unary_operation.expr.accept(self)
         self.indent_disable_count -= 1
-        return self.indent() + f'({unary_operation.op}{expr_result})'
+        return self.indent() + f'{unary_operation.op}({expr_result})'
 
 
 def pretty_print(program):
