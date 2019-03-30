@@ -26,6 +26,52 @@ class ASTNode(metaclass=abc.ABCMeta):
         в заданной области видимости и возвращает результат вычисления.
         """
 
+    @abc.abstractmethod
+    def accept(self, visitor):
+        pass
+
+
+class ASTNodeVisitor(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def visit_number(self, number):
+        pass
+
+    @abc.abstractmethod
+    def visit_function(self, function):
+        pass
+
+    @abc.abstractmethod
+    def visit_function_definition(self, func_definition):
+        pass
+
+    @abc.abstractmethod
+    def visit_function_call(self, func_call):
+        pass
+
+    @abc.abstractmethod
+    def visit_conditional(self, conditional):
+        pass
+
+    @abc.abstractmethod
+    def visit_print(self, print):
+        pass
+
+    @abc.abstractmethod
+    def visit_read(self, read):
+        pass
+
+    @abc.abstractmethod
+    def visit_reference(self, reference):
+        pass
+
+    @abc.abstractmethod
+    def visit_binary_operation(self, binary_operation):
+        pass
+
+    @abc.abstractmethod
+    def visit_unary_operation(self, unary_operation):
+        pass
+
 
 class Number(ASTNode):
     """
@@ -47,6 +93,9 @@ class Number(ASTNode):
 
     def evaluate(self, scope):
         return self
+
+    def accept(self, visitor):
+        return visitor.visit_number(self)
 
     def __eq__(self, other):
         if isinstance(other, int):
@@ -84,6 +133,9 @@ class Function(ASTNode):
     def evaluate(self, scope):
         return self
 
+    def accept(self, visitor):
+        return visitor.visit_function(self)
+
 
 class FunctionDefinition(ASTNode):
     """
@@ -102,6 +154,9 @@ class FunctionDefinition(ASTNode):
     def evaluate(self, scope):
         scope[self.name] = self.function
         return self.function
+
+    def accept(self, visitor):
+        return visitor.visit_function_definition(self)
 
 
 class FunctionCall(ASTNode):
@@ -147,6 +202,9 @@ class FunctionCall(ASTNode):
 
         return last_result
 
+    def accept(self, visitor):
+        return visitor.visit_function_call(self)
+
 
 class Conditional(ASTNode):
     """
@@ -182,6 +240,9 @@ class Conditional(ASTNode):
 
         return last_result
 
+    def accept(self, visitor):
+        return visitor.visit_conditional(self)
+
 
 class Print(ASTNode):
     """
@@ -206,6 +267,9 @@ class Print(ASTNode):
         print(result)
         return result
 
+    def accept(self, visitor):
+        return visitor.visit_print(self)
+
 
 class Read(ASTNode):
     """
@@ -229,6 +293,9 @@ class Read(ASTNode):
         scope[self.name] = value
         return value
 
+    def accept(self, visitor):
+        return visitor.visit_read(self)
+
 
 class Reference(ASTNode):
     """
@@ -242,6 +309,9 @@ class Reference(ASTNode):
 
     def evaluate(self, scope):
         return scope[self.name]
+
+    def accept(self, visitor):
+        return visitor.visit_reference(self)
 
 
 class BinaryOperation(ASTNode):
@@ -300,6 +370,9 @@ class BinaryOperation(ASTNode):
 
         return BinaryOperation.__OPERATORS[self.op](left, right)
 
+    def accept(self, visitor):
+        return visitor.visit_binary_operation(self)
+
 
 class UnaryOperation(ASTNode):
     """
@@ -326,3 +399,6 @@ class UnaryOperation(ASTNode):
             return Number(int(not bool(result)))
 
         return SyntaxError(f'unary operator {op} is not supported')
+
+    def accept(self, visitor):
+        return visitor.visit_unary_operation(self)
