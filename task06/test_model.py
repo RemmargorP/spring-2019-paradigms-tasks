@@ -225,5 +225,53 @@ def test_factorial():
                         Number(10)]).evaluate(scope) == 3628800
 
 
+def test_eq_number():
+    assert Number(0) == Number(0)
+    assert Number(1) == Number(1)
+
+
+def test_eq_function():
+    assert Function(['a', 'b'], [Number(0)]) == Function(
+        ['a', 'b'], [Number(0)])
+    assert FunctionDefinition(
+        'plus', Function(
+            ['a, b'], [
+                BinaryOperation(
+                    Reference('a'),
+                    '+',
+                    Reference('b'))])) == FunctionDefinition(
+        'plus', Function(
+            ['a, b'], [
+                BinaryOperation(
+                    Reference('a'), '+', Reference('b'))]))
+    assert FunctionCall('plus', [Number(1), Number(2)]) == FunctionCall(
+        'plus', [Number(1), Number(2)])
+
+
+def test_eq_conditional():
+    assert Conditional(Number(0), [], None) == Conditional(Number(0), None, [])
+
+
+def test_eq_print():
+    assert Print(Number(239)) == Print(Number(239))
+
+
+def test_eq_read():
+    assert Read('abc') == Read('abc')
+
+
+def test_eq_reference():
+    assert Reference('x') == Reference('x')
+
+
+def test_eq_binary_op():
+    assert BinaryOperation(Number(0), '+', Number(1)
+                           ) == BinaryOperation(Number(0), '+', Number(1))
+
+
+def test_eq_unary_op():
+    assert UnaryOperation('-', Number(1)) == UnaryOperation('-', Number(1))
+
+
 if __name__ == "__main__":
     pytest.main()
