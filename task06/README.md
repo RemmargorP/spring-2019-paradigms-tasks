@@ -286,7 +286,7 @@ pretty_print(mul)
 Например, следующий код:
 
 ```
-pretty_print(UnaryOperation('-', Number(42)))`
+pretty_print(UnaryOperation('-', Number(42)))
 ```
 может вывести следующий текст:
 ```
