@@ -75,7 +75,6 @@ impl std::ops::Index<usize> for Field {
     }
 }
 
-
 /// Реализация типажа `IndexMut<usize>` для структуры `Field`,
 /// позволяющая получать доступ к строчкам поля на запись при помощи оператора `[]`.
 /// Например: `field[row][col] = Empty` вместо `field.0[row][col] = Empty`.
@@ -154,50 +153,66 @@ impl Field {
 /// Юнит-тест для функции `Field::contradictory()`.
 #[test]
 fn test_contradictory() {
-    assert_eq!(false, Field([
-        [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-    ]).contradictory());
-    assert_eq!(true, Field([
-        [Digit(1), Digit(2), Digit(3), Digit(1), Empty, Empty, Empty, Empty, Empty],
-        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-    ]).contradictory());
-    assert_eq!(true, Field([
-        [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Digit(1), Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-    ]).contradictory());
-    assert_eq!(true, Field([
-        [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Digit(7), Digit(8), Digit(1), Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-    ]).contradictory());
+    assert_eq!(
+        false,
+        Field([
+            [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        ])
+        .contradictory()
+    );
+    assert_eq!(
+        true,
+        Field([
+            [Digit(1), Digit(2), Digit(3), Digit(1), Empty, Empty, Empty, Empty, Empty],
+            [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        ])
+        .contradictory()
+    );
+    assert_eq!(
+        true,
+        Field([
+            [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Digit(1), Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        ])
+        .contradictory()
+    );
+    assert_eq!(
+        true,
+        Field([
+            [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Digit(7), Digit(8), Digit(1), Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+            [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        ])
+        .contradictory()
+    );
 }
 
 /// Реализация типажа `fmt::Debug` для `Field`.
@@ -264,7 +279,7 @@ where
 mod io_test {
     // Пространства имён модулей независимы, поэтому надо заново писать `use`.
     use super::Cell::*;
-    use super::{Field, parse_field};
+    use super::{parse_field, Field};
 
     const FIELD: Field = Field([
         [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],

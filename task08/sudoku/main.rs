@@ -103,15 +103,17 @@ fn test_try_extend_field_all_steps() {
     let f_initial = f.clone();
     let mut called_with = Vec::new();
 
-    assert!(try_extend_field(&mut f,
+    assert!(try_extend_field(
+        &mut f,
         |_| panic!("Field is not solved"),
         |f_next| {
             called_with.push(f_next.clone());
-            None  // Продолжить перебор.
+            None // Продолжить перебор.
         }
-    ).is_none());
-    assert_eq!(f, f_initial);  // Поле не изменилось.
-    assert_eq!(called_with.len(), 9);  // Было перебрано 9 значений.
+    )
+    .is_none());
+    assert_eq!(f, f_initial); // Поле не изменилось.
+    assert_eq!(called_with.len(), 9); // Было перебрано 9 значений.
 
     let mut f = Field::empty();
     f[0][0] = Digit(1);
@@ -132,19 +134,23 @@ fn test_try_extend_field_first_steps() {
 
     let mut called_with = Vec::new();
 
-    assert_eq!(try_extend_field(&mut f,
-        |_| panic!("Field is not solved"),
-        |f_next| {
-            called_with.push(f_next.clone());
-            if called_with.len() < 3 {
-                None  // Продолжить перебор
-            } else {
-                Some(12345)  // Остановить перебор
+    assert_eq!(
+        try_extend_field(
+            &mut f,
+            |_| panic!("Field is not solved"),
+            |f_next| {
+                called_with.push(f_next.clone());
+                if called_with.len() < 3 {
+                    None // Продолжить перебор
+                } else {
+                    Some(12345) // Остановить перебор
+                }
             }
-        }
-    ), Some(12345));
+        ),
+        Some(12345)
+    );
     assert_eq!(called_with.len(), 3);
-    assert_eq!(f, called_with[2]);  // Поле оставлено в состоянии, когда перебор остановился.
+    assert_eq!(f, called_with[2]); // Поле оставлено в состоянии, когда перебор остановился.
 
     let mut f = Field::empty();
     f[0][0] = Digit(1);
