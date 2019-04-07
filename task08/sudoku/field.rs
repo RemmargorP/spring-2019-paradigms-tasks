@@ -59,10 +59,10 @@ impl fmt::Debug for Cell {
 ///
 /// Для поля автоматически выведена реализация типажа `Clone`, чтобы
 /// можно было вызывать `.clone()`.
+/// Аналогичным образом выведена реализация `PartialEq` и `Eq` для оператора `==`.
 /// Типаж `Copy` тоже можно было бы вывести автоматически, но поле — слишком
 /// большой объект, чтобы разрешать неявное копирование при помощи `=`.
-/// `PartialEq`, `Eq` просто не требуются в задании.
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct Field(pub [[Cell; N]; N]);
 
 impl Field {
@@ -179,6 +179,6 @@ where
         }
     }
     // В `reader` должно быть не более `N` строк.
-    assert_eq!(reader.next(), None);
+    assert!(reader.next().is_none());
     result
 }
