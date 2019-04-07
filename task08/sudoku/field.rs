@@ -131,6 +131,55 @@ impl Field {
     }
 }
 
+/// Юнит-тест для функции `Field::contradictory()`.
+#[test]
+fn test_contradictory() {
+    assert_eq!(false, Field([
+        [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+    ]).contradictory());
+    assert_eq!(true, Field([
+        [Digit(1), Digit(2), Digit(3), Digit(1), Empty, Empty, Empty, Empty, Empty],
+        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+    ]).contradictory());
+    assert_eq!(true, Field([
+        [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(1), Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+    ]).contradictory());
+    assert_eq!(true, Field([
+        [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(7), Digit(8), Digit(1), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+    ]).contradictory());
+}
+
 /// Реализация типажа `fmt::Debug` для `Field`.
 /// Он требуется для отладочной печати, например, при помощи `println!("{:?}", cell);`
 ///
@@ -188,4 +237,46 @@ where
     // В `reader` должно быть не более `N` строк.
     assert!(reader.next().is_none());
     result
+}
+
+/// Подмодуль, отдельно содержащий юнит-тесты для ввода-вывода.
+#[cfg(test)]
+mod io_test {
+    // Пространства имён модулей независимы, поэтому надо заново писать `use`.
+    use super::Cell::*;
+    use super::{Field, parse_field};
+
+    const FIELD: Field = Field([
+        [Digit(1), Digit(2), Digit(3), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(4), Digit(5), Digit(6), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Digit(7), Digit(8), Digit(9), Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+        [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+    ]);
+    const FORMATTED: &str = "\
+123......
+456......
+789......
+.........
+.........
+.........
+.........
+.........
+.........";
+
+    #[test]
+    fn test_debug_format() {
+        assert_eq!(FORMATTED, format!("{:?}", FIELD));
+    }
+
+    #[test]
+    fn test_parse_field() {
+        // Несмотря на то, что `.split()` возвращает итератор по кусочками строки,
+        // `parse_field()` требует владеющий `String`, поэтому требуется вызвать `.to_string()`.
+        assert_eq!(FIELD, parse_field(FORMATTED.split('\n').map(|x| x.to_string())));
+    }
 }
