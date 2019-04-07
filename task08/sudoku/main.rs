@@ -93,6 +93,69 @@ fn try_extend_field<T>(
     panic!("Field should've been non-full");
 }
 
+/// Юнит-тест на один шаг `try_extend_field`.
+#[test]
+fn test_try_extend_field_all_steps() {
+    let mut f: Field = Field::empty();
+    f[0][0] = Digit(1);
+
+    let f_initial = f.clone();
+    let mut called_with = Vec::new();
+
+    assert!(try_extend_field(&mut f,
+        |_| panic!("Field is not solved"),
+        |f_next| {
+            called_with.push(f_next.clone());
+            None  // Продолжить перебор.
+        }
+    ).is_none());
+    assert_eq!(f, f_initial);  // Поле не изменилось.
+    assert_eq!(called_with.len(), 9);  // Было перебрано 9 значений.
+
+    let mut f = Field::empty();
+    f[0][0] = Digit(1);
+
+    f[0][1] = Digit(1);
+    assert_eq!(f, called_with[0]);
+    f[0][1] = Digit(2);
+    assert_eq!(f, called_with[1]);
+    f[0][1] = Digit(9);
+    assert_eq!(f, called_with[8]);
+}
+
+/// Юнит-тест, проверяющий, что `try_extend_field` останавливается при получении `Some(x)`.
+#[test]
+fn test_try_extend_field_first_steps() {
+    let mut f: Field = Field::empty();
+    f[0][0] = Digit(1);
+
+    let mut called_with = Vec::new();
+
+    assert_eq!(try_extend_field(&mut f,
+        |_| panic!("Field is not solved"),
+        |f_next| {
+            called_with.push(f_next.clone());
+            if called_with.len() < 3 {
+                None  // Продолжить перебор
+            } else {
+                Some(12345)  // Остановить перебор
+            }
+        }
+    ), Some(12345));
+    assert_eq!(called_with.len(), 3);
+    assert_eq!(f, called_with[2]);  // Поле оставлено в состоянии, когда перебор остановился.
+
+    let mut f = Field::empty();
+    f[0][0] = Digit(1);
+
+    f[0][1] = Digit(1);
+    assert_eq!(f, called_with[0]);
+    f[0][1] = Digit(2);
+    assert_eq!(f, called_with[1]);
+    f[0][1] = Digit(3);
+    assert_eq!(f, called_with[2]);
+}
+
 /// Перебирает все возможные решения головоломки, заданной параметром `f`.
 /// Если хотя бы одно решение `s` существует, `f` оказывается равным `s`,
 /// а функция возвращает `Some(f)`.
