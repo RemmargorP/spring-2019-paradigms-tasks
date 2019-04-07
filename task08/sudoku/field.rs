@@ -17,7 +17,7 @@ pub const N: usize = K * K;
 #[derive(Copy, Clone, PartialEq)]
 pub enum Cell {
     Empty,
-    Digit(usize)
+    Digit(usize),
 }
 
 // Что бы постоянно не писать Cell::Empty "раскроем" внутренности Cell
@@ -26,10 +26,14 @@ use Cell::*;
 // напишем свой отладочный принтер для клетк
 impl fmt::Debug for Cell {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            Empty => '.',
-            Digit(x) => ('0' as usize + x) as u8 as char
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                Empty => '.',
+                Digit(x) => ('0' as usize + x) as u8 as char,
+            }
+        )
     }
 }
 
@@ -50,7 +54,7 @@ impl Field {
     pub fn full(&self) -> bool {
         self.0.iter().all(|cells| cells.iter().all(|c| *c != Empty))
     }
-    
+
     // Долгая проверка на то, что поле противоречиво
     pub fn contradictory(&self) -> bool {
         // Посмотрели на все строки
@@ -59,7 +63,9 @@ impl Field {
             for col in 0..N {
                 if let Digit(val) = self.0[row][col] {
                     let val = val as usize;
-                    if was[val] { return true; }
+                    if was[val] {
+                        return true;
+                    }
                     was[val] = true;
                 }
             }
@@ -70,7 +76,9 @@ impl Field {
             for row in 0..N {
                 if let Digit(val) = self.0[row][col] {
                     let val = val as usize;
-                    if was[val] { return true; }
+                    if was[val] {
+                        return true;
+                    }
                     was[val] = true;
                 }
             }
@@ -83,7 +91,9 @@ impl Field {
                     for col_d in 0..K {
                         if let Digit(val) = self.0[row_0 * K + row_d][col_0 * K + col_d] {
                             let val = val as usize;
-                            if was[val] { return true; }
+                            if was[val] {
+                                return true;
+                            }
                             was[val] = true;
                         }
                     }
@@ -98,7 +108,7 @@ impl Field {
 impl fmt::Debug for Field {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for (row_id, cells) in self.0.iter().enumerate() {
-           for cell in cells.iter() {
+            for cell in cells.iter() {
                 write!(f, "{:?}", cell)?;
             }
             if row_id + 1 < N {
@@ -112,7 +122,8 @@ impl fmt::Debug for Field {
 // Эта функция пытается распарсить данное ей строковое представление поля
 // в нашу структуру. Если у нее не получается -- падает с ошибкой
 pub fn parse_field<I>(reader: I) -> Field
-    where I: IntoIterator<Item=String>
+where
+    I: IntoIterator<Item = String>,
 {
     let mut result = Field::empty();
     let mut reader = reader.into_iter();
@@ -122,12 +133,11 @@ pub fn parse_field<I>(reader: I) -> Field
         assert_eq!(line.len(), N);
 
         for (col, ch) in line.chars().enumerate() {
-            result.0[row][col] =
-                match ch {
-                  '.' => Empty,
-                  '1'..='9' => Digit(ch.to_digit(10).unwrap() as usize),
-                  _ => panic!(format!("Unknown character: {}", ch))
-                }
+            result.0[row][col] = match ch {
+                '.' => Empty,
+                '1'..='9' => Digit(ch.to_digit(10).unwrap() as usize),
+                _ => panic!(format!("Unknown character: {}", ch)),
+            }
         }
     }
     assert_eq!(reader.next(), None);
