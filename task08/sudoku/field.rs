@@ -65,6 +65,26 @@ impl fmt::Debug for Cell {
 #[derive(Clone, PartialEq, Eq)]
 pub struct Field(pub [[Cell; N]; N]);
 
+/// Реализация типажа `Index<usize>` для структуры `Field`,
+/// позволяющая получать доступ к строчкам поля на чтение при помощи оператора `[]`.
+/// Например: `field[row][col]` вместо `field.0[row][col]`.
+impl std::ops::Index<usize> for Field {
+    type Output = [Cell; N];
+    fn index(&self, row: usize) -> &[Cell; N] {
+        &self.0[row]
+    }
+}
+
+
+/// Реализация типажа `IndexMut<usize>` для структуры `Field`,
+/// позволяющая получать доступ к строчкам поля на запись при помощи оператора `[]`.
+/// Например: `field[row][col] = Empty` вместо `field.0[row][col] = Empty`.
+impl std::ops::IndexMut<usize> for Field {
+    fn index_mut(&mut self, row: usize) -> &mut [Cell; N] {
+        &mut self.0[row]
+    }
+}
+
 impl Field {
     /// Создаёт новое пустое поле, т.е. в котором может находиться что угодно.
     pub fn empty() -> Field {
@@ -88,7 +108,7 @@ impl Field {
         for row in 0..N {
             let mut was = [false; N + 1];
             for col in 0..N {
-                if let Digit(val) = self.0[row][col] {
+                if let Digit(val) = self[row][col] {
                     let val = val as usize;
                     if was[val] {
                         return true;
@@ -101,7 +121,7 @@ impl Field {
         for col in 0..N {
             let mut was = [false; N + 1];
             for row in 0..N {
-                if let Digit(val) = self.0[row][col] {
+                if let Digit(val) = self[row][col] {
                     let val = val as usize;
                     if was[val] {
                         return true;
@@ -116,7 +136,7 @@ impl Field {
                 let mut was = [false; N + 1];
                 for row_d in 0..K {
                     for col_d in 0..K {
-                        if let Digit(val) = self.0[row_0 * K + row_d][col_0 * K + col_d] {
+                        if let Digit(val) = self[row_0 * K + row_d][col_0 * K + col_d] {
                             let val = val as usize;
                             if was[val] {
                                 return true;
@@ -227,7 +247,7 @@ where
         assert_eq!(line.len(), N);
 
         for (col, ch) in line.chars().enumerate() {
-            result.0[row][col] = match ch {
+            result[row][col] = match ch {
                 '.' => Empty,
                 '1'..='9' => Digit(ch.to_digit(10).unwrap() as usize),
                 _ => panic!(format!("Unknown character: {}", ch)),

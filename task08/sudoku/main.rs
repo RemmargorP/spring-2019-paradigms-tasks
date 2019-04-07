@@ -59,9 +59,9 @@ fn try_extend_field<T>(
     for row in 0..N {
         for col in 0..N {
             // Нашли пустую -- начинем перебирать все, что можно туда поставить
-            if f.0[row][col] == Empty {
+            if f[row][col] == Empty {
                 for d in 1..=N {
-                    f.0[row][col] = Digit(d);
+                    f[row][col] = Digit(d);
                     // поставили -- вызвали колбэк(третий параметр)
                     // Здесь мы смотрим, если он вернул Some(x) -- значит мы нашли решение
                     // Надо его вернуть и дело с концом
@@ -70,7 +70,7 @@ fn try_extend_field<T>(
                         return Some(x);
                     }
                     // И возвращаем все как было
-                    f.0[row][col] = Empty;
+                    f[row][col] = Empty;
                 }
                 return None;
             }
