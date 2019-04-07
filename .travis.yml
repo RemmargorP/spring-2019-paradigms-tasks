@@ -2,7 +2,9 @@
 language: minimal
 dist: xenial
 
-cache: pip
+cache:
+- pip
+- cargo
 install:
 - sudo add-apt-repository ppa:deadsnakes/ppa -y # python3.7 is unavailable in Xenial
 - sudo apt-get update
@@ -11,6 +13,8 @@ install:
 - source .py37/bin/activate
 - python --version
 - pip install -r requirements.txt -r requirements-dev.txt
+- curl https://sh.rustup.rs -sSf | sh
+- rustup component add rustfmt
 script:
 - find task?? -iname '*.py' | xargs pycodestyle --show-source
 - find task?? -iname '*.py' -not -iname 'test_*.py' | xargs -n 1 mypy
@@ -18,3 +22,5 @@ script:
 - pytest task03
 - pytest task04
 - pytest task06
+- cd task08/sudoku && cargo fmt --all -- --check
+- cd task08/sudoku && cargo build --verbose && cargo test --verbose
