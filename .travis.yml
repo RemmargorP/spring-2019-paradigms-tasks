@@ -13,7 +13,8 @@ install:
 - source .py37/bin/activate
 - python --version
 - pip install -r requirements.txt -r requirements-dev.txt
-- curl https://sh.rustup.rs -sSf | sh
+- curl https://sh.rustup.rs -sSf | sh -s -- -v -y
+- source $HOME/.cargo/env
 - rustup component add rustfmt
 script:
 - find task?? -iname '*.py' | xargs pycodestyle --show-source
@@ -22,5 +23,8 @@ script:
 - pytest task03
 - pytest task04
 - pytest task06
-- cd task08/sudoku && cargo fmt --all -- --check
-- cd task08/sudoku && cargo build --verbose && cargo test --verbose
+- pushd task08/sudoku
+- cargo fmt --all -- --check
+- cargo build --verbose
+- cargo test --verbose
+- popd
