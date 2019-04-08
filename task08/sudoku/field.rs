@@ -39,7 +39,7 @@ impl fmt::Debug for Cell {
             "{}",
             match self {
                 Empty => '.',
-                Digit(x) => std::char::from_digit(*x as u32, (N + 1) as u32).unwrap()
+                Digit(x) => std::char::from_digit(*x as u32, (N + 1) as u32).unwrap(),
             }
         )
     }
