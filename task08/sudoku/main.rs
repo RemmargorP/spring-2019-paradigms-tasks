@@ -273,10 +273,10 @@ fn main() {
     let now = std::time::Instant::now();
 
     // Запускаем поиск решения.
-    // Если оно есть, то печатаем его, в противном случае "паникуем"
-    // (вызываем критическую ошибку) с сообщением `No solution`.
-    // За "панику" отвечает вызов .expect() на типе `Option<>`.
-    let solution = find_solution_parallel(field).expect("No solution");
-    println!("{:?}", solution);
+    // Если оно есть, то печатаем его, в противном случае печатаем `No solution`.
+    match find_solution_parallel(field) {
+        Some(solution) => println!("{:?}", solution),
+        None => println!("No solution"),
+    };
     println!("Found in {} ms", now.elapsed().as_millis());
 }
