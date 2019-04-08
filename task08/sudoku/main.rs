@@ -201,6 +201,15 @@ fn test_find_solution_empty() {
     assert_eq!(found, expected);
 }
 
+/// Юнит-тест, проверяющий, что `find_solution()` не находит ответ, когда его не существует.
+#[test]
+fn test_find_solution_no_solution() {
+    let mut f = Field::empty();
+    f[0][0] = Digit(1);
+    f[0][1] = Digit(1);
+    assert!(find_solution(&mut f).is_none());
+}
+
 /// Юнит-тест, проверяющий, что `find_solution_parallel()` находит хоть какое-то решение на пустом поле.
 /// Мы не можем гарантировать, какое именно это будет решение, так как потоки выполняются недетерминировано.
 #[test]
@@ -208,6 +217,15 @@ fn test_find_solution_parallel_empty() {
     let found = find_solution_parallel(Field::empty()).unwrap();
     assert!(found.full());
     assert!(!found.contradictory());
+}
+
+/// Юнит-тест, проверяющий, что `find_solution_parallel()` не находит ответ, когда его не существует.
+#[test]
+fn test_find_solution_parallel_no_solution() {
+    let mut f = Field::empty();
+    f[0][0] = Digit(1);
+    f[0][1] = Digit(1);
+    assert!(find_solution_parallel(f).is_none());
 }
 
 /// Точка входа в нашу программу.
