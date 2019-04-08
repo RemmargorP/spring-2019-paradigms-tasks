@@ -171,6 +171,32 @@ fn find_solution(f: &mut Field) -> Option<Field> {
     try_extend_field(f, |f_solved| f_solved.clone(), find_solution)
 }
 
+#[test]
+fn test_find_solution_empty() {
+    let expected = parse_field(
+        [
+            "123456789",
+            "456789123",
+            "789123456",
+            "214365897",
+            "365897214",
+            "897214365",
+            "531642978",
+            "642978531",
+            "978531642",
+        ]
+        .iter()
+        .map(|x| x.to_string()),
+    );
+    assert!(expected.full());
+    assert!(!expected.contradictory());
+
+    let found = find_solution(&mut Field::empty()).unwrap();
+    assert!(found.full());
+    assert!(!found.contradictory());
+    assert_eq!(found, expected);
+}
+
 /// Точка входа в нашу программу.
 fn main() {
     // По подсказке компилятора: для корректного чтения строк через итератор
