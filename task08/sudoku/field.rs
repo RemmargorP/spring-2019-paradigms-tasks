@@ -108,7 +108,6 @@ impl Field {
             let mut was = [false; N + 1];
             for col in 0..N {
                 if let Digit(val) = self[row][col] {
-                    let val = val as usize;
                     if was[val] {
                         return true;
                     }
@@ -121,7 +120,6 @@ impl Field {
             let mut was = [false; N + 1];
             for row in 0..N {
                 if let Digit(val) = self[row][col] {
-                    let val = val as usize;
                     if was[val] {
                         return true;
                     }
@@ -136,7 +134,6 @@ impl Field {
                 for row_d in 0..K {
                     for col_d in 0..K {
                         if let Digit(val) = self[row_0 * K + row_d][col_0 * K + col_d] {
-                            let val = val as usize;
                             if was[val] {
                                 return true;
                             }
