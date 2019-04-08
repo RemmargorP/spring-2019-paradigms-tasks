@@ -39,7 +39,7 @@ impl fmt::Debug for Cell {
             "{}",
             match self {
                 Empty => '.',
-                Digit(x) => ('0' as usize + x) as u8 as char,
+                Digit(x) => std::char::from_digit(*x as u32, (N + 1) as u32).unwrap()
             }
         )
     }
@@ -261,9 +261,9 @@ where
         assert_eq!(line.len(), N);
 
         for (col, ch) in line.chars().enumerate() {
-            result[row][col] = match ch {
-                '.' => Empty,
-                '1'..='9' => Digit(ch.to_digit(10).unwrap() as usize),
+            result[row][col] = match ch.to_digit((N + 1) as u32) {
+                Some(x) => Digit(x as usize),
+                _ if ch == '.' => Empty,
                 _ => panic!(format!("Unknown character: {}", ch)),
             }
         }
