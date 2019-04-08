@@ -199,6 +199,8 @@ fn test_find_solution_empty() {
     assert_eq!(found, expected);
 }
 
+/// Юнит-тест, проверяющий, что `find_solution_parallel()` находит хоть какое-то решение на пустом поле.
+/// Мы не можем гарантировать, какое именно это будет решение, так как потоки выполняются недетерминировано.
 #[test]
 fn test_find_solution_parallel_empty() {
     let found = find_solution_parallel(Field::empty()).unwrap();
