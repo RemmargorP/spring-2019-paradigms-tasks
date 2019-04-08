@@ -164,6 +164,15 @@ fn find_solution(f: &mut Field) -> Option<Field> {
     try_extend_field(f, |f_solved| f_solved.clone(), find_solution)
 }
 
+/// Перебирает все возможные решения головоломки, заданной параметром `f`, в несколько потоков.
+/// Если хотя бы одно решение `s` существует, возвращает `Some(s)`,
+/// в противном случае возвращает `None`.
+fn find_solution_parallel(mut f: Field) -> Option<Field> {
+    // TODO: вам требуется изменить эту функцию.
+    find_solution(&mut f)
+}
+
+/// Юнит-тест, проверяющий, что `find_solution()` находит лексикографически минимальное решение на пустом поле.
 #[test]
 fn test_find_solution_empty() {
     let expected = parse_field(
@@ -190,6 +199,13 @@ fn test_find_solution_empty() {
     assert_eq!(found, expected);
 }
 
+#[test]
+fn test_find_solution_parallel_empty() {
+    let found = find_solution_parallel(Field::empty()).unwrap();
+    assert!(found.full());
+    assert!(!found.contradictory());
+}
+
 /// Точка входа в нашу программу.
 fn main() {
     // По подсказке компилятора: для корректного чтения строк через итератор
@@ -202,7 +218,7 @@ fn main() {
     // (попыткам прочитать строчку), а не `String`, нам требуется "достать"
     // из каждой попытки реальную строчку. Это делает метод `.unwrap()`,
     // который при неудачной попытке чтения вызывает "панику" (критическую ошибку).
-    let mut field = parse_field(stdin.lock().lines().map(|l| l.unwrap()));
+    let field = parse_field(stdin.lock().lines().map(|l| l.unwrap()));
     // stdin перестал быть нужен, избавимся от соответствующей переменной,
     // чтобы случайно не заиспользовать её потом.
     std::mem::drop(stdin);
@@ -214,6 +230,6 @@ fn main() {
     // Если оно есть, то печатаем его, в противном случае "паникуем"
     // (вызываем критическую ошибку) с сообщением `No solution`.
     // За "панику" отвечает вызов .expect() на типе `Option<>`.
-    let solution = find_solution(&mut field).expect("No solution");
+    let solution = find_solution_parallel(field).expect("No solution");
     println!("{:?}", solution);
 }
