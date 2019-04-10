@@ -268,12 +268,13 @@ fn main() {
     std::mem::drop(stdin);
 
     // Отладочный вывод поля, чтобы проверить корректность чтения.
-    println!("{:?}", field);
+    println!("\nGot field:\n{:?}", field);
 
     let now = std::time::Instant::now();
 
     // Запускаем поиск решения.
     // Если оно есть, то печатаем его, в противном случае печатаем `No solution`.
+    println!("\nLooking for a solution...");
     match find_solution_parallel(field) {
         Some(solution) => println!("{:?}", solution),
         None => println!("No solution"),
