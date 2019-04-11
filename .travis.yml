@@ -27,4 +27,5 @@ script:
 - cargo fmt --all -- --check
 - cargo build --verbose
 - cargo test --verbose
+- ./target/debug/sudoku < ../tests/03-medium.in
 - popd
