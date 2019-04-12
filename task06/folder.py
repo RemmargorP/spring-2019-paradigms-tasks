@@ -59,10 +59,8 @@ class ConstantFolder(ASTNodeVisitor):
 
         if isinstance(lhs, Number) and isinstance(rhs, Number):
             result = result.evaluate(Scope())
-        elif (isinstance(lhs, Number) and lhs.value == 0 and
-                op == '*' and isinstance(rhs, Reference)) or \
-             (isinstance(rhs, Number) and rhs.value == 0 and
-                op == '*' and isinstance(lhs, Reference)):
+        elif (lhs == 0 and op == '*' and isinstance(rhs, Reference)) or \
+             (rhs == 0 and op == '*' and isinstance(lhs, Reference)):
             result = Number(0)
         elif isinstance(lhs, Reference) and isinstance(rhs, Reference) and \
                 op == '-' and lhs.name == rhs.name:
