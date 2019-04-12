@@ -10,10 +10,13 @@ class PrettyPrinter(ASTNodeVisitor):
         self.indent_level = 0
         self.indent_disable_count = 0
 
+    def statementify(block):
+        return block + ';' if block and block[-1] != '}' else block
+
     def pretty_print(self, program):
         self.indent_level = 0
         self.indent_disable_count = 0
-        return program.accept(self) + ';'
+        return PrettyPrinter.statementify(program.accept(self))
 
     def indent(self):
         return ' ' * (PrettyPrinter.SPACES_PER_INDENT *
@@ -31,7 +34,7 @@ class PrettyPrinter(ASTNodeVisitor):
             '(' + ', '.join(func_def.function.args) + ') {\n'
         self.indent_level += 1
         for statement in func_def.function.body or []:
-            result += statement.accept(self) + ';\n'
+            result += PrettyPrinter.statementify(statement.accept(self)) + '\n'
         self.indent_level -= 1
         result += '}'
         return result
@@ -54,7 +57,7 @@ class PrettyPrinter(ASTNodeVisitor):
 
         self.indent_level += 1
         for statement in conditional.if_true or []:
-            result += statement.accept(self) + ';\n'
+            result += PrettyPrinter.statementify(statement.accept(self)) + '\n'
         self.indent_level -= 1
 
         result += self.indent() + '}'
@@ -64,7 +67,8 @@ class PrettyPrinter(ASTNodeVisitor):
 
             self.indent_level += 1
             for statement in conditional.if_false:
-                result += statement.accept(self) + ';\n'
+                result += PrettyPrinter.statementify(
+                    statement.accept(self)) + '\n'
             self.indent_level -= 1
 
             result += self.indent() + '}'
