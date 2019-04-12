@@ -7,13 +7,13 @@ from printer import *
 def test_pretty_conditional(capsys):
     pretty_print(Conditional(Number(42), [], []))
     out = capsys.readouterr().out
-    assert out.rstrip() == 'if (42) {\n};'
+    assert out.rstrip() == 'if (42) {\n}'
 
 
 def test_pretty_function_definition(capsys):
     pretty_print(FunctionDefinition("foo", Function([], [])))
     out = capsys.readouterr().out
-    assert out.rstrip() == 'def foo() {\n};'
+    assert out.rstrip() == 'def foo() {\n}'
 
 
 def test_pretty_print(capsys):
@@ -84,11 +84,11 @@ def test_complex(capsys):
         '    print x;',
         '    if ((2) == (3)) {',
         '        if (1) {',
-        '        };',
+        '        }',
         '    } else {',
         '        exit(-(arg1));',
-        '    };',
-        '};']
+        '    }',
+        '}']
 
 
 if __name__ == "__main__":
