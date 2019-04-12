@@ -71,9 +71,9 @@ class PrettyPrinter(ASTNodeVisitor):
 
         return result
 
-    def visit_print(self, print):
+    def visit_print(self, print_):
         self.indent_disable_count += 1
-        expr_result = print.expr.accept(self)
+        expr_result = print_.expr.accept(self)
         self.indent_disable_count -= 1
         return self.indent() + f'print {expr_result}'
 

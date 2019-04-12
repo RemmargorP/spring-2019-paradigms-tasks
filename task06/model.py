@@ -57,7 +57,7 @@ class ASTNodeVisitor(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def visit_print(self, print):
+    def visit_print(self, print_):
         pass
 
     @abc.abstractmethod
