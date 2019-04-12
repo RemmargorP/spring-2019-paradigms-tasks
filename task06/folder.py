@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from model import *
-from printer import *
 
 
 class ConstantFolder(ASTNodeVisitor):
