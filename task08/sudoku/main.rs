@@ -14,8 +14,8 @@ mod field;
 use field::Cell::*;
 use field::{parse_field, Field, N};
 
-use threadpool::ThreadPool;
 use std::sync::mpsc::{channel, Sender};
+use threadpool::ThreadPool;
 
 /// Эта функция выполняет один шаг перебора в поисках решения головоломки.
 /// Она перебирает значение какой-нибудь пустой клетки на поле всеми непротиворечивыми способами.
@@ -185,7 +185,7 @@ fn spawn_tasks(mut f: &mut Field, tx: Sender<Option<Field>>, pool: &ThreadPool, 
         try_extend_field(&mut f, &success, |field: &mut Field| -> Option<Field> {
             let tx = tx.clone();
             let mut field_clone = field.clone();
-            pool.execute(move|| {
+            pool.execute(move || {
                 tx.send(find_solution(&mut field_clone)).unwrap_or(());
             });
             None
@@ -200,7 +200,7 @@ fn find_solution_parallel(mut f: Field) -> Option<Field> {
     const SPAWN_DEPTH: i32 = 2;
 
     let (tx, rx) = channel();
-    
+
     let workers_count = 8;
     let pool = ThreadPool::new(workers_count);
 
