@@ -14,6 +14,9 @@ mod field;
 use field::Cell::*;
 use field::{parse_field, Field, N};
 
+use threadpool::ThreadPool;
+use std::sync::mpsc::{channel, Sender};
+
 /// Эта функция выполняет один шаг перебора в поисках решения головоломки.
 /// Она перебирает значение какой-нибудь пустой клетки на поле всеми непротиворечивыми способами.
 /// Что делать после фиксации значения, задаётся параметрами функции.
@@ -167,29 +170,41 @@ fn find_solution(f: &mut Field) -> Option<Field> {
     try_extend_field(f, |f_solved| f_solved.clone(), find_solution)
 }
 
+fn spawn_tasks(mut f: &mut Field, tx: &Sender<Option<Field>>, pool: &ThreadPool, depth: i32) {
+    let success = |field: &mut Field| {
+        let tx = tx.clone();
+        tx.send(Some(field.clone())).unwrap_or(());
+        field.clone()
+    };
+    if depth > 0 {
+        try_extend_field(&mut f, &success, |field: &mut Field| -> Option<Field> {
+            spawn_tasks(&mut field.clone(), &tx, &pool, depth - 1);
+            None
+        });
+    } else {
+        try_extend_field(&mut f, &success, |field: &mut Field| -> Option<Field> {
+            let tx = tx.clone();
+            let mut field_clone = field.clone();
+            pool.execute(move|| {
+                tx.send(find_solution(&mut field_clone)).unwrap_or(());
+            });
+            None
+        });
+    }
+}
+
 /// Перебирает все возможные решения головоломки, заданной параметром `f`, в несколько потоков.
 /// Если хотя бы одно решение `s` существует, возвращает `Some(s)`,
 /// в противном случае возвращает `None`.
 fn find_solution_parallel(mut f: Field) -> Option<Field> {
-    use threadpool::ThreadPool;
+    const SPAWN_DEPTH: i32 = 1;
 
-    let (tx, rx) = std::sync::mpsc::channel();
+    let (tx, rx) = channel();
     
     let workers_count = 8;
     let pool = ThreadPool::new(workers_count);
 
-    try_extend_field(&mut f, |field: &mut Field| {
-        let tx = tx.clone();
-        tx.send(Some(field.clone())).unwrap_or(());
-        field.clone()
-    }, |field: &mut Field| -> Option<Field> {
-        let tx = tx.clone();
-        let mut field_clone = field.clone();
-        pool.execute(move|| {
-            tx.send(find_solution(&mut field_clone)).unwrap_or(());
-        });
-        None
-    });
+    spawn_tasks(&mut f, &tx, &pool, SPAWN_DEPTH);
 
     rx.into_iter().find_map(|result| result)
 }
