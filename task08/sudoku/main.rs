@@ -171,8 +171,20 @@ fn find_solution(f: &mut Field) -> Option<Field> {
 /// Если хотя бы одно решение `s` существует, возвращает `Some(s)`,
 /// в противном случае возвращает `None`.
 fn find_solution_parallel(mut f: Field) -> Option<Field> {
+    use threadpool::ThreadPool;
+
     let (tx, rx) = std::sync::mpsc::channel();
-    tx.send(find_solution(&mut f)).unwrap();
+    
+    let workers_count = 8;
+    let pool = ThreadPool::new(workers_count);
+
+    {
+        let tx = tx.clone();
+        pool.execute(move|| {
+            tx.send(find_solution(&mut f)).unwrap();
+        });
+    }
+
     rx.recv().unwrap()
 }
 
