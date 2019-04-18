@@ -185,7 +185,7 @@ fn find_solution_parallel(mut f: Field) -> Option<Field> {
         });
     }
 
-    rx.recv().unwrap()
+    rx.into_iter().find_map(|result| result)
 }
 
 /// Юнит-тест, проверяющий, что `find_solution()` находит лексикографически минимальное решение на пустом поле.
