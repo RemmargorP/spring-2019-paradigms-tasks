@@ -178,12 +178,18 @@ fn find_solution_parallel(mut f: Field) -> Option<Field> {
     let workers_count = 8;
     let pool = ThreadPool::new(workers_count);
 
-    {
+    try_extend_field(&mut f, |field: &mut Field| {
         let tx = tx.clone();
+        tx.send(Some(field.clone())).unwrap_or(());
+        field.clone()
+    }, |field: &mut Field| -> Option<Field> {
+        let tx = tx.clone();
+        let mut field_clone = field.clone();
         pool.execute(move|| {
-            tx.send(find_solution(&mut f)).unwrap();
+            tx.send(find_solution(&mut field_clone)).unwrap_or(());
         });
-    }
+        None
+    });
 
     rx.into_iter().find_map(|result| result)
 }
