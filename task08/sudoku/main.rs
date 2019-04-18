@@ -197,7 +197,7 @@ fn spawn_tasks(mut f: &mut Field, tx: &Sender<Option<Field>>, pool: &ThreadPool,
 /// Если хотя бы одно решение `s` существует, возвращает `Some(s)`,
 /// в противном случае возвращает `None`.
 fn find_solution_parallel(mut f: Field) -> Option<Field> {
-    const SPAWN_DEPTH: i32 = 1;
+    const SPAWN_DEPTH: i32 = 2;
 
     let (tx, rx) = channel();
     
