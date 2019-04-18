@@ -91,5 +91,22 @@ def test_complex(capsys):
         '}']
 
 
+def test_nested(capsys):
+    pretty_print(FunctionDefinition('main', Function([], [
+        FunctionDefinition('plus', Function(['a', 'b'], [
+            BinaryOperation(Reference('a'), '+', Reference('b'))
+        ])),
+        FunctionCall(Reference('plus'), [Number(200), Number(39)])
+    ])))
+    out = capsys.readouterr().out
+    assert out.rstrip().split('\n') == [
+        'def main() {',
+        '    def plus(a, b) {',
+        '        (a) + (b);',
+        '    }',
+        '    plus(200, 39);',
+        '}']
+
+
 if __name__ == "__main__":
     pytest.main()

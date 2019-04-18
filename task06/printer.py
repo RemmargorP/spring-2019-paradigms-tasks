@@ -47,7 +47,7 @@ class PrettyPrinter(ASTNodeVisitor):
         return self.indent() + str(number.value)
 
     def visit_function(self, function):
-        raise RuntimeError('PrettyPrinter shouldn\'t visit function object')
+        raise TypeError('PrettyPrinter shouldn\'t visit function object')
 
     def visit_function_definition(self, func_def):
         result = self.indent() + 'def ' + func_def.name + \
@@ -56,7 +56,7 @@ class PrettyPrinter(ASTNodeVisitor):
             for statement in func_def.function.body or []:
                 result += PrettyPrinter.statementify(
                     statement.accept(self)) + '\n'
-        result += '}'
+        result += self.indent() + '}'
         return result
 
     def visit_function_call(self, func_call):
