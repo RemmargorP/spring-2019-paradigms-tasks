@@ -1,20 +1,17 @@
-#!/usr/bin/env python3
-
 from model import *
 
 
 class ConstantFolder(ASTNodeVisitor):
-    def fold(self, program):
+    def visit(self, program):
         return program.accept(self)
 
     def visit_number(self, number):
         return Number(number.value)
 
     def visit_function(self, function):
-        body_result = []
-        for statement in function.body or []:
-            body_result.append(statement.accept(self))
-        return Function(function.args[:], body_result)
+        body_result = [statement.accept(self)
+                       for statement in function.body or []]
+        return Function(function.args.copy(), body_result)
 
     def visit_function_definition(self, func_def):
         return FunctionDefinition(
@@ -23,21 +20,16 @@ class ConstantFolder(ASTNodeVisitor):
         )
 
     def visit_function_call(self, func_call):
-        args_result = []
-        for arg in func_call.args or []:
-            args_result.append(arg.accept(self))
+        args_result = [arg.accept(self) for arg in func_call.args or []]
         return FunctionCall(func_call.fun_expr.accept(self), args_result)
 
     def visit_conditional(self, conditional):
         condition_result = conditional.condition.accept(self)
 
-        if_true_result = []
-        for statement in conditional.if_true or []:
-            if_true_result.append(statement.accept(self))
-
-        if_false_result = []
-        for statement in conditional.if_false or []:
-            if_false_result.append(statement.accept(self))
+        if_true_result = [statement.accept(self)
+                          for statement in conditional.if_true or []]
+        if_false_result = [statement.accept(
+            self) for statement in conditional.if_false or []]
 
         return Conditional(condition_result, if_true_result, if_false_result)
 
@@ -59,11 +51,11 @@ class ConstantFolder(ASTNodeVisitor):
 
         if isinstance(lhs, Number) and isinstance(rhs, Number):
             result = result.evaluate(Scope())
-        elif (lhs == 0 and op == '*' and isinstance(rhs, Reference)) or \
-             (rhs == 0 and op == '*' and isinstance(lhs, Reference)):
+        elif ((lhs == 0 and op == '*' and isinstance(rhs, Reference)) or
+              (rhs == 0 and op == '*' and isinstance(lhs, Reference))):
             result = Number(0)
-        elif isinstance(lhs, Reference) and isinstance(rhs, Reference) and \
-                op == '-' and lhs.name == rhs.name:
+        elif (isinstance(lhs, Reference) and isinstance(rhs, Reference) and
+                op == '-' and lhs.name == rhs.name):
             result = Number(0)
 
         return result
@@ -77,4 +69,4 @@ class ConstantFolder(ASTNodeVisitor):
 
 
 def fold_constants(program):
-    return ConstantFolder().fold(program)
+    return ConstantFolder().visit(program)
