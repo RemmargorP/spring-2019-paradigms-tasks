@@ -55,3 +55,7 @@ def test_fold_complex():
             )
         )
     ) == Number(13)
+
+
+if __name__ == '__main__':
+    pytest.main()

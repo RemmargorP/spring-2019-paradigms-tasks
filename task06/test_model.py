@@ -273,5 +273,5 @@ def test_eq_unary_op():
     assert UnaryOperation('-', Number(1)) == UnaryOperation('-', Number(1))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pytest.main()
