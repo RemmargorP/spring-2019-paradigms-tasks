@@ -171,24 +171,20 @@ fn find_solution(f: &mut Field) -> Option<Field> {
 }
 
 fn spawn_tasks(mut f: &mut Field, tx: Sender<Option<Field>>, pool: &ThreadPool, depth: i32) {
-    let success = |field: &mut Field| {
-        let tx = tx.clone();
-        tx.send(Some(field.clone())).unwrap_or(());
-        field.clone()
-    };
     if depth > 0 {
-        try_extend_field(&mut f, &success, |field: &mut Field| -> Option<Field> {
-            spawn_tasks(&mut field.clone(), tx.clone(), &pool, depth - 1);
+        try_extend_field(&mut f, |f: &mut Field| {
+            let tx = tx.clone();
+            tx.send(Some(f.clone())).unwrap_or(());
+            Field::empty()
+        }, |f: &mut Field| {
+            spawn_tasks(f, tx.clone(), pool, depth - 1);
             None
         });
     } else {
-        try_extend_field(&mut f, &success, |field: &mut Field| -> Option<Field> {
-            let tx = tx.clone();
-            let mut field_clone = field.clone();
-            pool.execute(move || {
-                tx.send(find_solution(&mut field_clone)).unwrap_or(());
-            });
-            None
+        let tx = tx.clone();
+        let mut field_clone = f.clone();
+        pool.execute(move || {
+            tx.send(find_solution(&mut field_clone)).unwrap_or(());
         });
     }
 }
