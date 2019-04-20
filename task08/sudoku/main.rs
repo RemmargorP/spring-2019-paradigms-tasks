@@ -170,17 +170,16 @@ fn find_solution(f: &mut Field) -> Option<Field> {
     try_extend_field(f, |f_solved| f_solved.clone(), find_solution)
 }
 
-fn spawn_tasks(mut f: &mut Field, tx: Sender<Option<Field>>, pool: &ThreadPool, depth: i32) {
+fn spawn_tasks(mut f: &mut Field, tx: &Sender<Option<Field>>, pool: &ThreadPool, depth: i32) {
     if depth > 0 {
         try_extend_field(
             &mut f,
-            |f: &mut Field| {
+            |f| {
                 let tx = tx.clone();
                 tx.send(Some(f.clone())).unwrap_or(());
-                Field::empty()
             },
-            |f: &mut Field| {
-                spawn_tasks(f, tx.clone(), pool, depth - 1);
+            |f| {
+                spawn_tasks(f, tx, pool, depth - 1);
                 None
             },
         );
@@ -204,7 +203,9 @@ fn find_solution_parallel(mut f: Field) -> Option<Field> {
     let workers_count = 8;
     let pool = ThreadPool::new(workers_count);
 
-    spawn_tasks(&mut f, tx, &pool, SPAWN_DEPTH);
+    spawn_tasks(&mut f, &tx, &pool, SPAWN_DEPTH);
+
+    drop(tx);
 
     rx.into_iter().find_map(|result| result)
 }
