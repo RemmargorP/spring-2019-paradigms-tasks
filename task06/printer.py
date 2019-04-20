@@ -4,42 +4,36 @@ from model import *
 class PrettyPrinter(ASTNodeVisitor):
     SPACES_PER_INDENT = 4
 
-    class Indent:
-        def __init__(self, pretty_printer):
-            self.pretty_printer = pretty_printer
-
-        def __enter__(self):
-            self.pretty_printer.indent_level += 1
-
-        def __exit__(self, type, value, traceback):
-            self.pretty_printer.indent_level -= 1
-
-    class IndentDisabled:
-        def __init__(self, pretty_printer):
-            self.pretty_printer = pretty_printer
-
-        def __enter__(self):
-            self.pretty_printer.indent_disable_count += 1
-
-        def __exit__(self, type, value, traceback):
-            self.pretty_printer.indent_disable_count -= 1
-
     def __init__(self):
         self.indent_level = 0
         self.indent_disable_count = 0
 
+    @staticmethod
     def statementify(block):
         return block + ';' if block and block[-1] != '}' else block
 
-    def visit(self, program):
+    def pretty_print(self, program):
         self.indent_level = 0
         self.indent_disable_count = 0
         return PrettyPrinter.statementify(program.accept(self))
 
     def indent(self):
-        if self.indent_disable_count != 0:
+        if self.indent_disable_count:
             return ''
         return ' ' * (PrettyPrinter.SPACES_PER_INDENT * self.indent_level)
+
+    def visit_with_indent(self, body):
+        self.indent_level += 1
+        result = ''.join([self.statementify(statement.accept(self)) + '\n'
+                          for statement in body or []])
+        self.indent_level -= 1
+        return result
+
+    def visit_no_indent(self, expr):
+        self.indent_disable_count += 1
+        result = expr.accept(self)
+        self.indent_disable_count -= 1
+        return result
 
     def visit_number(self, number):
         return self.indent() + str(number.value)
@@ -50,50 +44,32 @@ class PrettyPrinter(ASTNodeVisitor):
     def visit_function_definition(self, func_def):
         result = (self.indent() + 'def ' + func_def.name +
                   '(' + ', '.join(func_def.function.args) + ') {\n')
-        with PrettyPrinter.Indent(self):
-            for statement in func_def.function.body or []:
-                result += PrettyPrinter.statementify(
-                    statement.accept(self)) + '\n'
+        result += self.visit_with_indent(func_def.function.body)
         result += self.indent() + '}'
         return result
 
     def visit_function_call(self, func_call):
-        with PrettyPrinter.IndentDisabled(self):
-            args_result = [arg.accept(self) for arg in func_call.args]
+        args_result = [self.visit_no_indent(arg) for arg in func_call.args]
 
-        return func_call.fun_expr.accept(
-            self) + '(' + ', '.join(args_result) + ')'
+        return (func_call.fun_expr.accept(self) +
+                '(' + ', '.join(args_result) + ')')
 
     def visit_conditional(self, conditional):
-        with PrettyPrinter.IndentDisabled(self):
-            condition_result = conditional.condition.accept(self)
+        condition_result = self.visit_no_indent(conditional.condition)
 
         result = self.indent() + 'if (' + condition_result + ') {\n'
-
-        with PrettyPrinter.Indent(self):
-            for statement in conditional.if_true or []:
-                result += PrettyPrinter.statementify(
-                    statement.accept(self)) + '\n'
-
+        result += self.visit_with_indent(conditional.if_true)
         result += self.indent() + '}'
 
         if conditional.if_false:
             result += ' else {\n'
-
-            with PrettyPrinter.Indent(self):
-                for statement in conditional.if_false:
-                    result += PrettyPrinter.statementify(
-                        statement.accept(self)) + '\n'
-
+            result += self.visit_with_indent(conditional.if_false)
             result += self.indent() + '}'
 
         return result
 
     def visit_print(self, print_):
-        with PrettyPrinter.IndentDisabled(self):
-            expr_result = print_.expr.accept(self)
-
-        return self.indent() + f'print {expr_result}'
+        return self.indent() + f'print {self.visit_no_indent(print_.expr)}'
 
     def visit_read(self, read):
         return self.indent() + f'read {read.name}'
@@ -102,19 +78,17 @@ class PrettyPrinter(ASTNodeVisitor):
         return self.indent() + reference.name
 
     def visit_binary_operation(self, binary_operation):
-        with PrettyPrinter.IndentDisabled(self):
-            lhs_result = binary_operation.lhs.accept(self)
-            rhs_result = binary_operation.rhs.accept(self)
+        lhs_result = self.visit_no_indent(binary_operation.lhs)
+        rhs_result = self.visit_no_indent(binary_operation.rhs)
 
         return (self.indent() +
                 f'({lhs_result}) {binary_operation.op} ({rhs_result})')
 
     def visit_unary_operation(self, unary_operation):
-        with PrettyPrinter.IndentDisabled(self):
-            expr_result = unary_operation.expr.accept(self)
+        expr_result = self.visit_no_indent(unary_operation.expr)
 
         return self.indent() + f'{unary_operation.op}({expr_result})'
 
 
 def pretty_print(program):
-    print(PrettyPrinter().visit(program))
+    print(PrettyPrinter().pretty_print(program))

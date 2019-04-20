@@ -24,14 +24,12 @@ class ConstantFolder(ASTNodeVisitor):
         return FunctionCall(func_call.fun_expr.accept(self), args_result)
 
     def visit_conditional(self, conditional):
-        condition_result = conditional.condition.accept(self)
-
-        if_true_result = [statement.accept(self)
-                          for statement in conditional.if_true or []]
-        if_false_result = [statement.accept(
-            self) for statement in conditional.if_false or []]
-
-        return Conditional(condition_result, if_true_result, if_false_result)
+        return Conditional(conditional.condition.accept(self),
+                           [statement.accept(self)
+                            for statement in conditional.if_true or []],
+                           [statement.accept(self)
+                            for statement in conditional.if_false or []]
+                           )
 
     def visit_print(self, print_):
         return Print(print_.expr.accept(self))
