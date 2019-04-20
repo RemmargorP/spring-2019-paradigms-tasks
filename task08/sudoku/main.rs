@@ -170,10 +170,10 @@ fn find_solution(f: &mut Field) -> Option<Field> {
     try_extend_field(f, |f_solved| f_solved.clone(), find_solution)
 }
 
-fn spawn_tasks(mut f: &mut Field, tx: &Sender<Option<Field>>, pool: &ThreadPool, depth: i32) {
+fn spawn_tasks(f: &mut Field, tx: &Sender<Option<Field>>, pool: &ThreadPool, depth: i32) {
     if depth > 0 {
         try_extend_field(
-            &mut f,
+            f,
             |f| {
                 tx.send(Some(f.clone())).unwrap_or(());
             },
