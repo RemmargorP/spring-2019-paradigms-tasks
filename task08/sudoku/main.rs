@@ -175,7 +175,6 @@ fn spawn_tasks(mut f: &mut Field, tx: &Sender<Option<Field>>, pool: &ThreadPool,
         try_extend_field(
             &mut f,
             |f| {
-                let tx = tx.clone();
                 tx.send(Some(f.clone())).unwrap_or(());
             },
             |f| {
@@ -185,9 +184,9 @@ fn spawn_tasks(mut f: &mut Field, tx: &Sender<Option<Field>>, pool: &ThreadPool,
         );
     } else {
         let tx = tx.clone();
-        let mut field_clone = f.clone();
+        let mut f = f.clone();
         pool.execute(move || {
-            tx.send(find_solution(&mut field_clone)).unwrap_or(());
+            tx.send(find_solution(&mut f)).unwrap_or(());
         });
     }
 }
@@ -197,16 +196,13 @@ fn spawn_tasks(mut f: &mut Field, tx: &Sender<Option<Field>>, pool: &ThreadPool,
 /// в противном случае возвращает `None`.
 fn find_solution_parallel(mut f: Field) -> Option<Field> {
     const SPAWN_DEPTH: i32 = 2;
-
-    let (tx, rx) = channel();
-
     let workers_count = 8;
     let pool = ThreadPool::new(workers_count);
+    let (tx, rx) = channel();
 
     spawn_tasks(&mut f, &tx, &pool, SPAWN_DEPTH);
 
     drop(tx);
-
     rx.into_iter().find_map(|result| result)
 }
 
