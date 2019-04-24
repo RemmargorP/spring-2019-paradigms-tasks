@@ -18,7 +18,9 @@ void queue_init(Queue *q) {
 }
 
 void queue_destroy(Queue *q) {
-    assert(!q->head);
+    while (!queue_empty(q)) {
+        queue_pop(q);
+    }
 }
 
 bool queue_empty(Queue *q) {
