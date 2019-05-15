@@ -2,7 +2,8 @@
 -- порядке убывания процента. В случае равенства процентов, отсортировать города
 -- в порядке обратном лексикографическому (вывод: название города, его
 -- население, население страны). (0,5 баллов)
-SELECT City.Name, City.Population, Country.Population FROM City
+SELECT City.Name, City.Population, Country.Population 
+  FROM City
   JOIN Country ON City.CountryCode=Country.Code
   ORDER BY CAST(City.Population AS FLOAT) / CAST(Country.Population AS FLOAT) DESC, City.Name DESC
   LIMIT 20;
