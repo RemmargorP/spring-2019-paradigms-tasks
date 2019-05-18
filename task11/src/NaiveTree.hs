@@ -27,7 +27,9 @@ data NaiveTree k a =
   что все ключи из @l@ строго меньше ключей из @r@.
 -}
 merge :: NaiveTree k a -> NaiveTree k a -> NaiveTree k a
-merge = undefined
+merge Nil right = right
+merge (Node keyL valueL leftL rightL) right = Node keyL valueL leftL (merge rightL right)
+
 
 {-|
   Реализация функций 'Map' для 'NaiveTree'.
@@ -43,16 +45,29 @@ merge = undefined
   Скорее всего, при реализации вам потребуется функция 'merge'.
 -}
 instance Map NaiveTree where
-    empty = undefined
+    empty = Nil
 
-    singleton = undefined
+    singleton key value = Node key value Nil Nil
 
-    toAscList = undefined
+    toAscList Nil = []
+    toAscList (Node key value left right) = toAscList left ++ [(key, value)] ++ toAscList right
 
-    alter = undefined
+    alter f key Nil = maybe empty (singleton key) $ f Nothing
+    alter f key (Node rkey rval rleft rright)
+        | key < rkey = merge (alter f key rleft) (Node rkey rval Nil rright)
+        | key > rkey = merge (Node rkey rval rleft Nil) (alter f key rright)
+        | otherwise  = case f (Just rval) of
+            Just x -> merge (merge rleft (Node key x Nil Nil)) rright
+            Nothing -> merge rleft rright
 
-    lookup = undefined
+    lookup _ Nil = Nothing
+    lookup key (Node rkey rval rleft rright)
+        | key < rkey = Map.lookup key rleft
+        | key > rkey = Map.lookup key rright
+        | otherwise  = Just rval
 
-    null = undefined
+    null Nil = True
+    null _ = False
 
-    size = undefined
+    size Nil = 0
+    size (Node _ _ left right) = 1 + size left + size right
