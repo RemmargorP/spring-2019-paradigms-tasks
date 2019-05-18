@@ -220,8 +220,8 @@ testNaiveTree = testGroup "Test NaiveTree" [
 testMap :: TestTree
 testMap = testGroup "Testing implementations of trees"
     [
-        mapTests "Data.Map.Strict" (Proxy :: Proxy SMap.Map)
-        -- mapTests "NaiveList" (Proxy :: Proxy NaiveList)
+        mapTests "Data.Map.Strict" (Proxy :: Proxy SMap.Map),
+        mapTests "NaiveList" (Proxy :: Proxy NaiveList)
         -- mapTests "NaiveTree" (Proxy :: Proxy NaiveTree)
         -- testNaiveTree
     ]
